@@ -1,3 +1,6 @@
+Name Rao Afrasiab
+st id 60781
+
 # Game of Life simulator
 
 ## Summary and rules
