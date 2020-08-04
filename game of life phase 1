@@ -1,0 +1,125 @@
+{\rtf1\ansi\ansicpg1252\deff0\deflang1033{\fonttbl{\f0\fnil\fcharset0 Calibri;}}
+{\*\generator Msftedit 5.41.21.2510;}\viewkind4\uc1\pard\sa200\sl276\slmult1\lang9\f0\fs22 Name Rao Afrasiab\par
+st id 60781\par
+\par
+int count_alive(const char *field, int i, int j, int size)\par
+\{\par
+   int x, y, a=0;\par
+   for(x=i-1; x <= (i+1) ; x++)\par
+   \{\par
+      for(y=j-1; y <= (j+1) ; y++)\par
+      \{\par
+         if ( (x==i) && (y==j) ) continue;\par
+         if ( (y<size) && (x<size) &&\par
+              (x>=0)   && (y>=0) )\par
+         \{\par
+              a += CELL(x,y);\par
+         \}\par
+      \}\par
+   \}\par
+   return a;\par
+\}\par
+ \par
+void evolve(const char *field, char *t, int size)\par
+\{\par
+   int i, j, alive, cs;\par
+   for(i=0; i < size; i++)\par
+   \{\par
+      for(j=0; j < size; j++)\par
+      \{\par
+         alive = count_alive(field, i, j, size);\par
+         cs = CELL(i,j);\par
+         if ( cs )\par
+         \{\par
+            if ( (alive > 3) || ( alive < 2 ) )\par
+                DEAD(i,j);\par
+            else\par
+                ALIVE(i,j);\par
+         \} else \{\par
+            if ( alive == 3 )\par
+                ALIVE(i,j);\par
+            else\par
+                DEAD(i,j);\par
+         \}\par
+      \}\par
+   \}\par
+\}\par
+\par
+char small_blinker[] = \{0, 0, 0, 0, 0, 0, 0, 0\par
+0, 0, 0, 0, 1, 1, 0, 0\par
+0, 0, 0, 0, 1, 0, 0, 0\par
+0, 0, 0, 0, 0, 0, 0, 0\par
+\};\par
+char temp_blinker[BLINKER_SIZE*BLINKER_SIZE];\par
+ \par
+#define FIELD_SIZE 45\par
+#define FIELD_GEN 175\par
+char field[FIELD_SIZE * FIELD_SIZE];\par
+char temp_field[FIELD_SIZE*FIELD_SIZE];\par
+ \par
+\par
+#define SCELL(I,J) field[FIELD_SIZE*(I)+(J)] = 1\par
+ \par
+void dump_field(const char *f, int size)\par
+\{\par
+   int i;\par
+   for (i=0; i < (size*size); i++)\par
+   \{\par
+      if ( (i % size) == 0 ) printf("\\n");\par
+      printf("%c", f[i] ? 'X' : '.');\par
+   \}\par
+   printf("\\n");\par
+\}\par
+ \par
+ \par
+int main(int argc, char **argv)\par
+\{\par
+    int i;\par
+    char *fa, *fb, *tt, op;\par
+ \par
+\par
+    if ( argc > 1 )\par
+    \{\par
+       op = *argv[1];\par
+    \} else \{\par
+       op = 'b';\par
+    \}\par
+ \par
+    switch ( op )\par
+    \{\par
+      case 'B':\par
+      case 'b':\par
+        /* blinker test */\par
+        fa = small_blinker;\par
+        fb = temp_blinker;\par
+        for(i=0; i< BLINKER_GEN; i++)\par
+        \{\par
+           dump_field(fa, BLINKER_SIZE);\par
+           evolve(fa, fb, BLINKER_SIZE);\par
+           tt = fb; fb = fa; fa = tt;\par
+        \}\par
+        return 0;\par
+      case 'G':\par
+      case 'g':\par
+        for(i=0; i < (FIELD_SIZE*FIELD_SIZE) ; i++) field[i]=0;\par
+\par
+                     SCELL(0, 1);\par
+                                  SCELL(1, 2);\par
+        SCELL(2, 0); SCELL(2, 1); SCELL(2, 2);\par
+        /* evolve */\par
+        fa = field;\par
+        fb = temp_field;\par
+        for (i=0; i < FIELD_GEN; i++)\par
+        \{\par
+           dump_field(fa, FIELD_SIZE);\par
+           evolve(fa, fb, FIELD_SIZE);\par
+           tt = fb; fb = fa; fa = tt;\par
+        \}\par
+        return 0;\par
+      default:\par
+        fprintf(stderr, "no CA for this\\n");\par
+        break;\par
+    \}\par
+    return 1;\par
+\}\par
+}
